@@ -54,7 +54,7 @@ export default {
         if (request.method === "POST" && url.pathname === "/save_data") {
             // Čitamo email koji nam Zero Trust prosledjuje nakon uspešnog PIN-a
             const adminEmail = request.headers.get('Cf-Access-Authenticated-User-Email');
-            const TVOJ_MASTER_EMAIL = "knezz@selection.rs"; // Tvoj jedinstveni master nalog
+            const TVOJ_MASTER_EMAIL = "selectionrooms@gmail.com"; // Tvoj jedinstveni master nalog
 
             try {
                 const formData = await request.formData();
