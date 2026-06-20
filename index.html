@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas.me</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Pinyon+Script&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="icon" type="image/png" href="fav.png">
+    <link rel="apple-touch-icon" href="fav.png">
+    <link rel="shortcut icon" type="image/x-icon" href="fav.png">
+    <link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+    <div id="fade-overlay"></div>
+    <div id="particles-container"></div>
+    <div id="skip-catcher"></div>
+    <button class="global-33-btn" id="g-33" onclick="restartExpedition()">33</button>
+
+    <div id="loader" class="visible">
+        <div id="loader-prefix" class="laser-red"></div>
+        <h1 id="loader-title" class="laser-gold"></h1>
+        <div id="loader-subtitle" class="laser-red"></div>
+
+        <div id="click-to-begin-prompt">Click anywhere to enter</div>
+
+        <hr id="loader-hr">
+
+        <div class="warning-box" id="warning-box" onclick="startAdventure(event)">
+            <div class="warning-title" id="warning-title"></div>
+            <div id="warning-text-slots"></div>
+            <div class="warning-final-line" id="warning-final-line"></div>
+            <div class="warning-click-prompt">[ Click anywhere on the box to enter ]</div>
+        </div>
+    </div>
+
+    <div id="fullscreen-video-overlay">
+        <video id="p-vid" preload="auto" playsinline></video>
+    </div>
+
+    <audio id="global-audio" preload="auto"></audio>
+    <audio id="ss-audio" loop preload="auto"></audio>
+    <audio id="loader-audio" loop preload="auto"></audio> ```
+
+    <div id="global-barrier" class="gate-zone">
+        <div class="quiz-card">
+            <div class="gate-hint" id="global-gate-hint"></div>
+            <input type="search" id="global-gate-input" autocomplete="off" autocorrect="off" autocapitalize="off"
+                spellcheck="false">
+            <div id="global-gate-err" class="error-msg"></div>
+            <button class="next-page-btn-gold" id="global-gate-btn" onclick="checkGlobalGate()"></button>
+        </div>
+    </div>
+
+    <div id="stage">
+        <div id="main-bg"></div>
+        <div id="main-overlay"></div>
+        <div id="main-content"></div>
+    </div>
+
+    <div id="epilogue-screen">
+        <div id="art-quote-slot"></div>
+        <div class="epilogue-paint" id="paint-label"></div>
+    </div>
+
+    <div id="image-zoom-overlay" onclick="closeImageZoom()">
+        <img id="zoomed-img" src="" alt="Zoomed view">
+    </div>
+    <div id="screensaver-layer"
+        style="position:fixed; inset:0; background:rgba(4,6,8,0.95); backdrop-filter:blur(15px); z-index:100090; display:none; opacity:0; transition:opacity 1000ms ease; pointer-events:none;">
+        <div
+            style="margin:auto; font-family:var(--font-header); color:var(--primary-color); font-style:italic; font-size:1.5em; letter-spacing:4px; opacity:0.4; animation:roseBreathe 3s infinite;">
+            Ambiance Active...
+        </div>
+    </div>
+    <script src="canvas.js"></script>
+</body>
+
+</html>

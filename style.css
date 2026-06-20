@@ -1,0 +1,967 @@
+/* ==========================================================================
+   PROMENLJIVE KOJE KORISNIK MENJA KROZ ADMIN PANEL (CMS)
+   ========================================================================== */
+:root {
+    /* Boje povezane sa tvojim novim Selection Adminom */
+    --primary-color: #cca462;
+    /* H1 Nivo (Glavno zlato) */
+    --secondary-color: #d4b483;
+    /* H2 Nivo (Kurziv, citati, i sekundarni sjaj) */
+    --text-color: #e2e8f0;
+    /* P Nivo (Glavna čitljiva boja teksta) */
+    --meta-color: #a0acb8;
+    /* SMALL Nivo (Podnaslovi poglavlja i sitne info greške) */
+
+    /* Okruženje celog ekrana (Inicijalizuje se kroz canvas.js na osnovu admina) */
+    --bg-color: #0f171e;
+    --container-bg: rgba(30, 35, 40, 0.85);
+
+    /* Fiksni sistemski akcenti */
+    --blood-rose: #b81d24;
+    /* Dramatična crvena za važne momente / finale */
+    --container-border: 1px solid rgba(204, 164, 98, 0.2);
+
+    /* Tipografija (CMS dropdown birači fontova) */
+    --font-header: 'Playfair Display', serif;
+    --font-quote: 'Cormorant Garamond', serif;
+    /* Elegantni kurziv */
+    --font-body: 'Montserrat', sans-serif;
+
+    /* Brzine filmskih tranzicija */
+    --transition-speed: 2000ms;
+    --video-transition-speed: 2000ms;
+}
+
+/* ==========================================================================
+   UNIVERZALNI RESET I OSNOVNI STILOVI
+   ========================================================================== */
+html,
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-body);
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+/* ==========================================================================
+   FILMSKI PRELAZI I ČESTICE
+   ========================================================================== */
+#fade-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: #000000;
+    z-index: 1020;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-speed) ease;
+}
+
+#fade-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#fade-overlay.video-long {
+    transition: opacity var(--video-transition-speed) ease;
+}
+
+#particles-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100040;
+    overflow: hidden;
+}
+
+.particle {
+    position: absolute;
+    pointer-events: none;
+    animation: fall linear infinite;
+    transition: opacity 2000ms ease-out;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(-10vh) rotate(0deg);
+    }
+
+    100% {
+        transform: translateY(110vh) rotate(360deg);
+    }
+}
+
+/* ==========================================================================
+   SPLASH / LOADER EKRAN
+   ========================================================================== */
+#loader {
+    position: fixed;
+    inset: 0;
+    background: #000000;
+    z-index: 1030;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity var(--transition-speed) ease;
+    padding: 0 10%;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+#click-to-begin-prompt {
+    font-family: var(--font-body);
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--meta-color);
+    /* Promenjeno da sluša tvoj Small nivo */
+    margin-top: 40px;
+    text-transform: uppercase;
+    opacity: 0.6;
+    animation: roseBreathe 2s infinite;
+}
+
+#loader-hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(204, 164, 98, 0.6), transparent);
+    width: 60%;
+    margin: 20px auto 25px auto;
+    display: none;
+}
+
+/* ==========================================================================
+   UNIFIKOVANI MODULARNI LASERSKI EFEKTI (100% Dinamičke boje)
+   ========================================================================== */
+.laser-gold,
+.laser-red {
+    font-weight: 300;
+    text-align: center;
+    display: block;
+    width: max-content;
+    margin: 0 auto;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    background-size: 300% auto;
+    animation: textLaserShine 3s infinite linear;
+}
+
+/* MODULARNI H1 LASERSKI SJAJ (Zlato / Primarna Boja) */
+.laser-gold {
+    font-family: var(--font-header);
+    font-style: italic;
+    font-size: clamp(2.5em, 5vw, 4.2em);
+    background-image: linear-gradient(90deg,
+            var(--primary-color) 0%,
+            var(--primary-color) 45%,
+            #ffffff 50%,
+            var(--primary-color) 55%,
+            var(--primary-color) 100%);
+}
+
+/* MODULARNI H2 LASERSKI SJAJ (Sekundarna Boja iz Admina) */
+.laser-red {
+    font-family: var(--font-quote);
+    font-size: 2.5em;
+    background-image: linear-gradient(90deg,
+            var(--secondary-color) 0%,
+            var(--secondary-color) 45%,
+            #ffffff 50%,
+            var(--secondary-color) 55%,
+            var(--secondary-color) 100%);
+}
+
+@keyframes textLaserShine {
+    0% {
+        background-position: 150% center;
+    }
+
+    100% {
+        background-position: -50% center;
+    }
+}
+
+/* ==========================================================================
+   WARNING BOX (Upozorenje na početku)
+   ========================================================================== */
+.warning-box {
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+    line-height: 1.6;
+    margin-top: 25px;
+    opacity: 0.85;
+    display: none;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.warning-box:hover {
+    transform: scale(1.01);
+}
+
+.warning-title {
+    color: var(--blood-rose);
+    /* Moćni fiksni crveni akcenat za reč Warning */
+    font-weight: 600;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+}
+
+.warning-final-line {
+    margin-top: 25px;
+    font-style: italic;
+    color: var(--secondary-color);
+    /* Prati H2 nivo za emotivnu završnu liniju */
+}
+
+.warning-click-prompt {
+    font-family: var(--font-body);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    margin-top: 30px;
+    opacity: 0.6;
+}
+
+/* ==========================================================================
+   VIDEO OVERLAY MODUL
+   ========================================================================== */
+#fullscreen-video-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1015;
+    background: #000;
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--video-transition-speed) ease;
+}
+
+#fullscreen-video-overlay.active {
+    display: block !important;
+    opacity: 1 !important;
+}
+
+#fullscreen-video-overlay video {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#skip-catcher {
+    position: fixed;
+    inset: 0;
+    z-index: 1018;
+    display: none;
+    background: transparent;
+}
+
+/* ==========================================================================
+   BEZBEDNOSNA KAPIJA (Gate Modul)
+   ========================================================================== */
+.gate-zone {
+    position: fixed;
+    inset: 0;
+    background: #000000;
+    z-index: 1030;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1800ms ease;
+}
+
+.gate-zone.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.quiz-card {
+    position: relative;
+    z-index: 10;
+    background: var(--container-bg);
+    border: var(--container-border);
+    backdrop-filter: blur(5px);
+    padding: 60px 40px;
+    text-align: center;
+    max-width: 700px;
+    width: 85%;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    border-radius: 4px;
+    transition: all 0.5s ease;
+}
+
+.quiz-card:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 30px rgba(204, 164, 98, 0.15);
+}
+
+.gate-hint {
+    font-family: var(--font-header);
+    font-style: italic;
+    color: var(--secondary-color);
+    /* Promenjeno na H2 za luksuzniju definiciju teksta zagonetke */
+    font-size: 1.5em;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+input[type="search"] {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #333;
+    color: var(--primary-color);
+    padding: 15px;
+    width: 80%;
+    text-align: center;
+    font-family: var(--font-body);
+    letter-spacing: 2px;
+    outline: none;
+    font-size: 0.95em;
+    margin-bottom: 25px;
+    transition: all 0.4s ease;
+}
+
+input[type="search"]:focus {
+    border-color: var(--primary-color);
+    background: rgba(204, 164, 98, 0.05);
+}
+
+input[type="search"]::-webkit-search-cancel-button {
+    display: none !important;
+}
+
+.error-msg {
+    color: var(--blood-rose);
+    font-size: 1.05em;
+    margin-top: 10px;
+    opacity: 0;
+    display: block;
+    transition: opacity 0.4s ease;
+}
+
+.error-msg.show {
+    opacity: 1 !important;
+}
+
+/* ==========================================================================
+   SCENSKI PROSTOR I STRANICE (Chapters)
+   ========================================================================== */
+#stage {
+    position: relative;
+    z-index: 5;
+}
+
+#main-bg {
+    position: fixed;
+    inset: 0;
+    filter: blur(3px);
+    z-index: 0;
+    display: none;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+#main-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 24, 28, 0.75);
+    z-index: 1;
+    display: none;
+}
+
+#main-content {
+    max-width: 700px;
+    width: 75%;
+    margin: 0 auto;
+    padding: 80px 20px;
+    display: none;
+    position: relative;
+    z-index: 5;
+}
+
+.page {
+    display: none;
+    opacity: 0;
+    transform: translateY(30px) scale(0.97);
+    background: var(--container-bg);
+    border: var(--container-border);
+    padding: 50px 60px;
+    border-radius: 4px;
+    margin-bottom: 60px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
+}
+
+.page.active {
+    display: block !important;
+    opacity: 1 !important;
+    transform: translateY(0) scale(1);
+}
+
+.page p {
+    font-size: 1.1em;
+    line-height: 2;
+    text-align: justify;
+    margin-bottom: 25px;
+    color: var(--text-color);
+    /* Prati P nivo iz admina */
+}
+
+.letter-header {
+    font-family: var(--font-header);
+    font-size: clamp(2em, 4vw, 3.2em);
+    font-weight: 400;
+    font-style: italic;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    background-image: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-color) 45%, #ffffff 50%, var(--primary-color) 55%, var(--primary-color) 100%);
+    background-size: 300% auto;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    animation: textLaserShine 4s infinite linear;
+}
+
+.chapter-subtitle {
+    font-family: var(--font-body);
+    font-size: 0.75em;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--meta-color);
+    /* Prati Small nivo iz admina */
+    margin-bottom: 40px;
+    font-weight: 300;
+    text-align: center;
+}
+
+.page h2 {
+    font-family: var(--font-quote);
+    color: var(--secondary-color);
+    /* Modularna boja za citate (H2) */
+    font-size: 1.6em;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+    margin: 45px auto;
+    max-width: 85%;
+}
+
+blockquote.quote-slot {
+    display: block;
+    margin: 45px auto;
+    padding: 10px 20px;
+    max-width: 85%;
+    border: none;
+    text-align: center;
+    color: var(--secondary-color);
+    /* Modularna boja za audio citate (H2) */
+    font-family: var(--font-quote);
+    font-style: italic;
+    font-size: 1.6em;
+    line-height: 1.6;
+    cursor: pointer;
+    transition: transform 0.4s ease;
+}
+
+blockquote.quote-slot:hover {
+    transform: scale(1.03);
+}
+
+/* ==========================================================================
+   NAVIGACIJA UNUTAR PRIČE (Next / Back)
+   ========================================================================== */
+.final-nav-flex-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    margin-top: 40px;
+}
+
+.inner-back-btn {
+    background: transparent;
+    border: none;
+    color: var(--meta-color);
+    /* Sluša Small nivo za rafinisan sveden izgled */
+    font-size: 2.5em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0.4;
+    line-height: 1;
+}
+
+.inner-back-btn:hover {
+    opacity: 1;
+    color: var(--primary-color);
+    transform: scale(1.1);
+}
+
+.next-page-btn-gold,
+.next-page-btn-red {
+    display: block;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+    font-family: var(--font-header);
+    font-size: 2.2em;
+    font-weight: 400;
+    font-style: italic;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    transition: transform 0.3s ease;
+}
+
+.next-page-btn-gold {
+    background-image: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-color) 45%, #ffffff 50%, var(--primary-color) 55%, var(--primary-color) 100%);
+    background-size: 300% auto;
+    animation: textLaserShine 3s infinite linear;
+}
+
+.next-page-btn-red {
+    background-image: linear-gradient(90deg, var(--blood-rose) 0%, var(--blood-rose) 45%, #ff4d4d 50%, var(--blood-rose) 55%, var(--blood-rose) 100%);
+    background-size: 300% auto;
+    animation: textLaserShine 3s infinite linear;
+}
+
+.next-page-btn-gold:hover,
+.next-page-btn-red:hover {
+    transform: scale(1.05);
+}
+
+/* ==========================================================================
+   MALI RAM GALERIJE (Na stranici) I STRELICE
+   ========================================================================== */
+.autoplay-album-frame {
+    position: relative;
+    display: block;
+    left: 50%;
+    transform: translateX(-50%) rotate(-1.5deg);
+    width: 100%;
+    max-width: 700px;
+    height: 450px;
+    background: #000;
+    border-radius: 4px;
+    border: 25px solid #090603;
+    outline: 3px solid var(--primary-color);
+    outline-offset: -14px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5), 0 15px 35px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(0, 0, 0, 0.9);
+    cursor: zoom-in;
+    overflow: hidden;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
+}
+
+.autoplay-album-frame:hover {
+    transform: translateX(-50%) rotate(0deg) scale(1.02);
+}
+
+.autoplay-slide {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 1000ms ease-in-out;
+}
+
+.autoplay-slide.active {
+    opacity: 1;
+}
+
+.mini-gallery-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 700px;
+    margin: -35px auto 40px auto;
+    padding: 0 5px;
+    box-sizing: border-box;
+}
+
+.mini-gallery-arrow {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-header);
+    font-size: 2.5em;
+    font-weight: 300;
+    line-height: 1;
+    padding: 0 15px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    background-image: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-color) 45%, #ffffff 50%, var(--primary-color) 55%, var(--primary-color) 100%);
+    background-size: 300% auto;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    animation: textLaserShine 4s infinite linear;
+    opacity: 0.6;
+}
+
+.mini-gallery-arrow:hover {
+    transform: scale(1.2);
+    opacity: 1;
+}
+
+/* ==========================================================================
+   BIOSKOPSKI VELIKI ZOOM OVERLAY I STRANICA STRELICE
+   ========================================================================== */
+#image-zoom-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(4, 6, 8, 0.92);
+    backdrop-filter: blur(8px);
+    z-index: 100100;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    cursor: zoom-out;
+    opacity: 0;
+}
+
+#image-zoom-overlay.active {
+    display: flex !important;
+    opacity: 1;
+}
+
+#image-zoom-overlay img {
+    max-width: 90vw;
+    max-height: 85vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.9);
+    border: 2px solid rgba(204, 164, 98, 0.3);
+    border-radius: 4px;
+    transform: scale(0.95);
+    opacity: 0;
+    transition: transform 1200ms ease-in-out, opacity 1200ms ease-in-out;
+}
+
+#image-zoom-overlay.active img {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.zoom-global-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    font-family: var(--font-header);
+    font-size: 5em;
+    cursor: pointer;
+    z-index: 100200;
+    transition: transform 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.zoom-global-arrow:hover {
+    color: var(--primary-color);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.zoom-global-arrow.arrow-left {
+    left: 40px;
+}
+
+.zoom-global-arrow.arrow-right {
+    right: 40px;
+}
+
+/* ==========================================================================
+   MODUL FINALE I PISMO (The Final Letter)
+   ========================================================================== */
+.final-letter-theme {
+    background: #faf6eb !important;
+    color: #2c2212 !important;
+    border: 3px double var(--primary-color) !important;
+    border-radius: 8px;
+    padding: 60px 50px !important;
+    position: relative;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.7), inset 0 0 50px rgba(204, 164, 98, 0.2) !important;
+}
+
+.final-letter-theme p {
+    font-family: 'Caveat', cursive !important;
+    font-size: 1.7em !important;
+    line-height: 2.2 !important;
+    color: #382c18 !important;
+    text-align: justify;
+}
+
+.gold-corner {
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    border: 2px solid var(--primary-color);
+    pointer-events: none;
+}
+
+.corner-tl {
+    top: 15px;
+    left: 15px;
+    border-right: none;
+    border-bottom: none;
+}
+
+.corner-tr {
+    top: 15px;
+    right: 15px;
+    border-left: none;
+    border-bottom: none;
+}
+
+.corner-bl {
+    bottom: 15px;
+    left: 15px;
+    border-right: none;
+    border-top: none;
+}
+
+.corner-br {
+    bottom: 15px;
+    right: 15px;
+    border-left: none;
+    border-top: none;
+}
+
+#final-love-msg {
+    font-family: 'Pinyon Script', cursive;
+    font-size: 3.5em;
+    color: var(--blood-rose);
+    /* Zadržan fiksni dramatični akcenat */
+    text-align: center;
+    margin-top: 50px;
+    opacity: 0;
+    transition: opacity 3000ms ease;
+}
+
+#final-signature {
+    font-family: 'Pinyon Script', cursive;
+    font-size: 2.8em;
+    color: var(--secondary-color);
+    /* Prebačeno na H2 nivo za simetriju */
+    text-align: right;
+    margin-top: 20px;
+    margin-right: 40px;
+    opacity: 0;
+    transition: opacity 3000ms ease;
+}
+
+.robot-final-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-align: center;
+    margin: 80px auto;
+    width: fit-content;
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    transition: opacity 1.5s ease, transform 1.5s ease;
+}
+
+.robot-final-container.active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.robot-final-container.active .final-rose-pulse {
+    animation: roseBreathe 3s ease-in-out infinite;
+    animation-delay: 1.5s;
+}
+
+.rose-icon {
+    width: 55px;
+    height: 55px;
+    fill: none;
+    transition: all 0.4s ease;
+}
+
+@keyframes roseBreathe {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 0 5px rgba(248, 3, 3, 0.5));
+        transform: scale(1);
+    }
+
+    12% {
+        filter: drop-shadow(0 0 35px rgba(248, 3, 3, 0.95));
+        transform: scale(1.08);
+    }
+
+    24% {
+        filter: drop-shadow(0 0 15px rgba(248, 3, 3, 0.4));
+        transform: scale(1.02);
+    }
+
+    36% {
+        filter: drop-shadow(0 0 30px rgba(248, 3, 3, 0.9));
+        transform: scale(1.06);
+    }
+
+    48% {
+        filter: drop-shadow(0 0 5px rgba(248, 3, 3, 0.2));
+        transform: scale(1);
+    }
+}
+
+/* ==========================================================================
+   EPILOG EKRAN
+   ========================================================================== */
+#epilogue-screen {
+    position: fixed;
+    inset: 0;
+    background: #000000;
+    z-index: 1030;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 3000ms ease;
+}
+
+#epilogue-screen.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#art-quote-slot {
+    font-family: var(--font-header);
+    font-style: italic;
+    font-size: 1.6em;
+    color: var(--primary-color);
+    line-height: 1.6;
+    text-align: center;
+    max-width: 80%;
+    transition: opacity 3000ms ease;
+}
+
+.epilogue-paint {
+    font-family: 'Pinyon Script', cursive;
+    font-size: 3.8em;
+    color: var(--blood-rose);
+    opacity: 0;
+    margin-top: 20px;
+    transition: opacity 3000ms ease;
+}
+
+/* ==========================================================================
+   SISTEMSKO DEV DUGME ( 33 RESTART )
+   ========================================================================== */
+.global-33-btn {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10005;
+    background: transparent;
+    border: none;
+    color: var(--meta-color);
+    font-family: var(--font-body);
+    font-size: 10px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    opacity: 0.15;
+    transition: 0.5s;
+    padding: 12px 24px;
+    display: none;
+}
+
+.global-33-btn:hover {
+    opacity: 0.7;
+    color: var(--primary-color);
+}
+
+/* ==========================================================================
+   RESPONSIVE OPTIMIZACIJA (Mobilni ekrani)
+   ========================================================================== */
+@media (max-width: 600px) {
+    #main-content {
+        width: 95% !important;
+        padding: 20px 0 !important;
+    }
+
+    .page {
+        padding: 25px 15px !important;
+        margin-bottom: 25px;
+    }
+
+    .laser-gold {
+        font-size: 3.2em !important;
+    }
+
+    .laser-red {
+        font-size: 1.5em !important;
+    }
+
+    .autoplay-album-frame {
+        width: 95% !important;
+        height: 232px !important;
+        border: 12px solid #090603 !important;
+    }
+
+    .mini-gallery-navigation {
+        margin: -45px auto 30px auto;
+        width: 95%;
+    }
+
+    .final-nav-flex-wrapper {
+        gap: 20px;
+    }
+
+    .zoom-global-arrow {
+        font-size: 3.5em;
+    }
+
+    .zoom-global-arrow.arrow-left {
+        left: 15px;
+    }
+
+    .zoom-global-arrow.arrow-right {
+        right: 15px;
+    }
+}
